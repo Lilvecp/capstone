@@ -1,0 +1,19 @@
+encoded_input,coefficient
+numeric__current_lap_s,3.489744872343633
+numeric__recent_mean_s,4.2868881130454835
+numeric__current_lap_number,0.000805705945428389
+numeric__current_tyre_life,0.04500470567920042
+category__current_compound_HARD,0.11507524417624511
+category__current_compound_MEDIUM,0.044013509553687935
+category__current_compound_SOFT,-0.15908875372993297
+category__current_team_Alpine,-0.04801997359054942
+category__current_team_Aston Martin,0.1450692363059345
+category__current_team_Audi,-0.0007836621465273307
+category__current_team_Cadillac,0.05990437068186554
+category__current_team_Ferrari,-0.0047357562992115035
+category__current_team_Haas F1 Team,-0.01073087971115987
+category__current_team_McLaren,-0.02916877531347369
+category__current_team_Mercedes,-0.03642835404689835
+category__current_team_Racing Bulls,-0.018257766378048705
+category__current_team_Red Bull Racing,-0.018060145080658507
+category__current_team_Williams,-0.03878829442127253

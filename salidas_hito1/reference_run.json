@@ -1,0 +1,30 @@
+{
+  "train_rows": 5772,
+  "validation_rows": 1808,
+  "test_used": false,
+  "seed": 414,
+  "features": [
+    "current_lap_s",
+    "recent_mean_s",
+    "current_lap_number",
+    "current_tyre_life",
+    "current_compound",
+    "current_team"
+  ],
+  "target": "next_lap_s",
+  "train_median_s": 84.762,
+  "validation_pair_id_set_sha256": "f453a98dc906904cba7307f7e25b67fbd9c9087df0a92a87477cf63422b76a57",
+  "data_sha256": {
+    "train_clean_v1.csv": "43544f38cc9ef32b44886e6751e03522601265160086fe3a4956f04b87bd5c13",
+    "validation_clean_v1.csv": "b19efb6a908af12a5d2c6bdde29aa40984295e62ce0f187a201b579278db7ee8",
+    "nextlap_reference_v1.py": "f6c58925cd4a477bf3e1a5a2b3968e67df3a1cffabecee9e89701c3ac2d5f994"
+  },
+  "environment": {
+    "python": "3.12.10",
+    "numpy": "2.5.4",
+    "pandas": "3.1.1",
+    "sklearn": "1.9.1",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "checks_passed": 9
+}

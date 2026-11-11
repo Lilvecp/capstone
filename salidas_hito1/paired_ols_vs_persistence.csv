@@ -1,0 +1,4 @@
+population,n,MAE_OLS_minus_persistence_s,share_rows_OLS_better
+all_validation,1808,-0.022581766450116142,0.5160398230088495
+round_8 (Austrian Grand Prix),1066,-0.02694539034526751,0.5300187617260788
+round_9 (British Grand Prix),742,-0.016312732660046923,0.49595687331536387

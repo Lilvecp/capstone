@@ -1,0 +1,10 @@
+check,passed,detail
+C1 versión de datos (SHA-256),True,"{'train_clean_v1.csv': '43544f38cc9ef32b44886e6751e03522601265160086fe3a4956f04b87bd5c13', 'validation_clean_v1.csv': 'b19efb6a908af12a5d2c6bdde29aa40984295e62ce0f187a201b579278db7ee8', 'nextlap_reference_v1.py': 'f6c58925cd4a477bf3e1a5a2b3968e67df3a1cffabecee9e89701c3ac2d5f994'}"
+C2 conteos,True,train=5772 val=1808
+C3 rondas,True,"train=[1, 2, 3, 4, 5, 6, 7] val=[8, 9]"
+C4 pair_id único y disjunto,True,train∩val = ∅
+C5 split temporal,True,último train 2026-06-14 < primer val 2026-06-28
+C6 solo pares clean,True,clean_pair == True en ambos
+C7 sin columnas futuras como input,True,"['current_lap_s', 'recent_mean_s', 'current_lap_number', 'current_tyre_life', 'current_compound', 'current_team']"
+C8 preprocesamiento ajustado solo con train,True,"{'current_lap_s': np.float64(86.7776), 'recent_mean_s': np.float64(86.8146), 'current_lap_number': np.float64(30.1757), 'current_tyre_life': np.float64(15.9044)}"
+"C9 predicciones finitas, mismas filas para los 3 modelos",True,"1808 filas, 1 predicción por modelo y pair_id"
