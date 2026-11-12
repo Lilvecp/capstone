@@ -2,7 +2,7 @@
 
 Predecir, al final de la vuelta t, la duración de la vuelta t+1 del mismo piloto (`next_lap_s`, segundos).
 
-Equipo: ________ · Repo: ________ · Commit entregado: ________
+Equipo: Castro–Bufadel (sin nombre formal) · Repo: https://github.com/Lilvecp/capstone · Commit entregado: ver tag `Hito1` y el texto de entrega
 
 ## Qué hay aquí
 
@@ -11,6 +11,7 @@ Equipo: ________ · Repo: ________ · Commit entregado: ________
 | `HITO1.md` | Encuadre, referencia reproducida, hipótesis y plan de experimento |
 | `DECISION_LOG.md` | Decisiones, revisión tras feedback, uso de IA y contribuciones reales |
 | `hito1_reference.py` | Reproduce mediana de train, persistencia y OLS, con 9 checks automáticos |
+| `hito1_feasibility_traffic.py` | Factibilidad de la hipótesis (gap al auto de adelante): fuente, timestamp, cobertura y mismos `pair_id`. 7 checks. Sin modelos |
 | `salidas_hito1/` | Salidas generadas por el script (ver abajo) |
 | `base_NextLap/` | Datos y helper del curso (`IIT414W_Capstone_NextLap_StudentData_v1`, sin cambios) |
 | `requirements.txt` | Dependencias |
@@ -33,9 +34,10 @@ Los snapshots originales por carrera están en `base_NextLap/data/` (manifest: `
 python3 -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python hito1_reference.py
+python hito1_feasibility_traffic.py
 ```
 
-Tarda unos segundos. Imprime la tabla de MAE y termina con `9 checks OK`. Si un check falla, se detiene con el motivo.
+Tarda unos segundos. El primero imprime la tabla de MAE y termina con `9 checks OK`; el segundo imprime la cobertura y termina con `7 checks OK`. Requiere Python ≥ 3.11 (pandas ≥ 2.3). Si un check falla, se detiene con el motivo.
 
 ## Salidas (`salidas_hito1/`)
 
@@ -46,6 +48,7 @@ Tarda unos segundos. Imprime la tabla de MAE y termina con `9 checks OK`. Si un 
 | `validation_reference_predictions.csv` | Predicción de cada modelo por `pair_id` (trazabilidad) |
 | `ols_coefficients.csv` | Coeficientes del OLS sobre inputs estandarizados/one-hot |
 | `checks.csv` | Resultado de los checks C1–C9 |
+| `feasibility_traffic_*.csv/json` | Checks F1–F7, cobertura del gap en train/val y distribución por carrera de train |
 | `reference_run.json` | Conteos, features, mediana de train, hash del set de `pair_id` de validación, SHA-256 y versiones del entorno |
 
 ## Atribución

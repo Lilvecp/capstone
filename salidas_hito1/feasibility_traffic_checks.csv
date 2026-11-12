@@ -1,0 +1,8 @@
+check,passed,detail
+F1 snapshots R1–R9 sin test,True,"rondas=[1, 2, 3, 4, 5, 6, 7, 8, 9]"
+F2 timestamp usado <= fin de t,True,el auto de adelante siempre cruzó antes o a la vez
+F3 nunca el mismo piloto,True,el auto anterior es otro piloto
+F4 mismos pair_id que el release (train),True,n=5772
+F5 mismos pair_id que el release (validación),True,n=1808
+F6 hash del set de validación = referencia,True,f453a98dc906904c
+F7 recent_mean_s reconstruido = publicado,True,max |dif| = 1.42e-14

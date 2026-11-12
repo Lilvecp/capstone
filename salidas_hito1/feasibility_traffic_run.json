@@ -1,0 +1,20 @@
+{
+  "feature": "gap_ahead_s = end_time_s(t) - end_time_s del auto que cruzó inmediatamente antes (otro piloto, misma carrera)",
+  "planned_representation": "min(gap_ahead_s, 5.0)",
+  "validation_target_used": false,
+  "models_fitted": 0,
+  "validation_pair_id_set_sha256": "f453a98dc906904cba7307f7e25b67fbd9c9087df0a92a87477cf63422b76a57",
+  "train_gap_distribution_s": {
+    "count": 5772.0,
+    "mean": 4.6942,
+    "std": 7.6604,
+    "min": 0.001,
+    "10%": 0.588,
+    "25%": 1.078,
+    "50%": 2.446,
+    "75%": 5.5723,
+    "90%": 10.0264,
+    "max": 91.931
+  },
+  "checks_passed": 7
+}

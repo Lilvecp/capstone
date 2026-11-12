@@ -1,7 +1,7 @@
 # Hito 1 · NextLap · Framing and experiment plan
 
-Equipo: ________ · Integrantes: Valentín Castro, ________
-Repo: ________ · Commit: ________ · Fecha: 12-11-2026
+Equipo: Castro–Bufadel (sin nombre formal) · Integrantes: Valentín Castro, Camilo Bufadel
+Repo: https://github.com/Lilvecp/capstone · Commit: ver tag `Hito1` y el texto de entrega · Fecha: 12-11-2026
 
 ## 1. Problem and decision value  — [A · Valentín]
 
@@ -39,34 +39,67 @@ Fuente: `salidas_hito1/reference_metrics.csv`. Hash del conjunto de `pair_id` de
 
 *Nota de ejecución:* ver el entorno exacto (Python/numpy/pandas/sklearn) en `salidas_hito1/reference_run.json`. Los MAE coinciden con las salidas del instructor hasta ~1e-15 s.
 
-## 3. Primary hypothesis  — [B · compañero/a]
+## 3. Primary hypothesis  — [B · Camilo]
 
-- Feature / representación propuesta:
-- Mecanismo esperado:
-- Fuente:
-- Disponibilidad en t (regla temporal y de agrupación):
-- Regla para datos faltantes o historial corto:
-- Plan B (si aplica):
+Dirección elegida: **Tráfico**, medido con los propios datos de tiempos publicados (sin fuente externa).
 
-## 4. Experiment plan  — [B · compañero/a]
+| Elemento | Definición |
+|---|---|
+| Feature propuesta | `gap_ahead_s` = `end_time_s` de la vuelta t del piloto − `end_time_s` del auto (otro piloto, misma carrera) que cruzó la línea **inmediatamente antes**. Representación pre-declarada: `gap_ahead_cap_s = min(gap_ahead_s, 5,0)`. Se agrega como **una** numérica más a los 6 inputs de la referencia. |
+| Mecanismo esperado | Un auto a < ~1–2 s adelante al final de t probablemente sigue cerca en t+1: aire sucio (más lento, sobre todo en curvas) o rebufo/DRS (más rápido en rectas). `current_lap_s` y `recent_mean_s` ya reflejan el tráfico de t, pero no dicen si el piloto **sigue** detrás de alguien; la feature agrega esa información. Más allá de ~5 s el efecto debería ser nulo, por eso el tope. No fijamos el signo de antemano: lo que se evalúa es si mejora el MAE frente a la misma referencia sin ella. |
+| Fuente | `base_NextLap/data/race_2026_r0X_laps_v2.csv` (release v1, SHA-256 verificado contra `source_manifest_v2.json` por `load_snapshots`). Están las 21–22 vueltas por carrera de **todos** los pilotos, con un mismo reloj de sesión `end_time_s`. |
+| Disponibilidad en t | Solo usa `end_time_s` de otros autos con `end_time_s ≤ end_time_s(t)`: ya cruzaron la línea cuando termina t, así que es observable en ese instante. No usa vueltas futuras, gaps posteriores, posición final ni ningún `next_*`. Se calcula sobre la **línea de tiempo original completa** (incluye vueltas de pit, SC y no precisas de los demás, porque el tráfico físico existe igual) **antes** del filtro `clean_pair`, y después se une por (`round`, `driver_number`, `current_lap_number`). |
+| Verificación ya hecha | `python hito1_feasibility_traffic.py` → 7 checks OK (`salidas_hito1/feasibility_traffic_*`): el timestamp usado nunca es posterior al fin de t (F2), nunca es el mismo piloto (F3), el set de `pair_id` clean reconstruido es **idéntico** al del release en train (5.772) y validación (1.808) (F4–F6, hash `f453a98d…`) y `recent_mean_s` se reconstruye igual (F7). Cobertura: **0 faltantes** en train y validación. En train, el 22,9 % de los pares tiene un auto a < 1 s y el 27,9 % está a ≥ 5 s (en validación, 18,1 % y 24,9 %). El script no ajusta modelos ni lee el target de validación. |
+| Datos faltantes / historial corto | La feature no depende de historial del stint, así que no hay regla de ventana corta. Solo puede faltar si nadie cruzó antes en la sesión (no ocurre con vuelta ≥ 2 en R1–9). Regla fija: si falta, se usa el tope (5 s = "aire libre") y se cuenta cuántas filas la usaron. Esto debe dar 0 filas en validación. |
+| Riesgos conocidos | (i) El auto "anterior" puede ser uno con una vuelta de diferencia o uno que está entrando a boxes: igual es tráfico en pista, salvo en el caso de pit. Lo cubrimos con la sensibilidad S1 (§4). (ii) Que haya un auto cerca al final de t no garantiza que siga cerca en t+1. (iii) La población `clean_pair` (verde, sin pit) ya excluye parte del tráfico más extremo. |
+| Plan B | No se necesita fuente externa. Si la feature no aporta, el resultado negativo se reporta igual. Como representación alternativa ya declarada queda el indicador `gap_ahead_s < 1,0` (zona DRS), que también se calcula con los datos publicados. |
 
-- Qué queda fijo:
-- Comparación referencia vs extensión:
-- Ablación (extensión sin la info añadida):
-- Qué apoyaría / contradiría la hipótesis:
-- Uso de validación y protección del test:
-- Búsqueda planificada (acotada) y registro de intentos:
-- Checks previos (escritos antes de implementar):
-- Robustez: MAE por carrera de validación con conteos
+## 4. Experiment plan  — [B · Camilo]
+
+**Fijo en todas las corridas:** target `next_lap_s` (s); split R1–7 / R8–9; las **mismas 1.808 filas** de validación (hash del set de `pair_id` = `f453a98d…`, que se verifica antes de calcular el MAE); el mismo modelo `make_model('OLS', numeric=NUMERIC+[feature])` del helper; preprocesamiento (imputación por mediana + escalado + one-hot) ajustado **solo con train** dentro del `Pipeline`; métrica MAE en segundos; seed 414.
+
+| Exp. | Inputs | Modelo | Filas | Qué aísla |
+|---|---|---|---|---|
+| E0 Referencia | 6 inputs de referencia | OLS | train 5.772 / val 1.808 | Línea base (MAE 0,387 s, ya reproducida) |
+| E1 Extensión | 6 + `gap_ahead_cap_s` | OLS (mismo) | mismas | E1 − E0 = aporte de la información de tráfico |
+| E2 Placebo | 6 + `gap_ahead_cap_s` **permutado al azar dentro de cada carrera** (seed 414) | OLS (mismo) | mismas | Que la mejora no venga solo de tener una columna más con esa distribución. Si E2 ≈ E1, la mejora no es por el tráfico |
+| E1b Alternativa pre-declarada | 6 + indicador `gap < 1 s` | OLS (mismo) | mismas | Representación alternativa (solo si se elige en la selección) |
+| S1 Sensibilidad | igual a E1, pero sin contar como "auto adelante" a los que están en vuelta de pit in/out | OLS (mismo) | mismas | Si la señal depende de autos que están en boxes |
+
+La ablación principal es **E1 vs E0** (la misma extensión sin la información añadida = la referencia), con el **placebo E2** como control de que no es solo "una columna más". No se cambia de algoritmo: cambiar el modelo no prueba si la información sirve.
+
+**Selección vs evaluación final.**
+1. La elección entre E1 y E1b (como máximo **2 variantes**, el tope de 5 s fijado antes) se hace con *leave-one-race-out* **dentro de train** (7 folds, R1–7). Se elige la de menor MAE medio. Si la diferencia es < 0,005 s, se queda E1 por ser más simple.
+2. **Validación R8–9 se usa una sola vez** para la variante elegida, su placebo y S1. No se vuelve a ajustar nada después de mirarla.
+3. El **test reservado** no está en el paquete y no se usa para elegir features, parámetros ni modelos. Ningún integrante tuvo acceso previo a él.
+4. Todas las corridas, incluidas las que no mejoran, quedan en `DECISION_LOG.md` y en un `trials_log.csv` (variante, folds, MAE, fecha y quién).
+
+**Qué apoyaría / contradiría la hipótesis (fijado antes de implementar):**
+- *Apoya:* MAE(E1) < MAE(E0) en validación **y en las dos carreras por separado (R8 y R9)**, E2 sin mejora (|E2 − E0| < la mitad de la ganancia de E1), y una mejora concentrada en filas con `gap < 2 s` (si aparece donde el gap es ≥ 5 s, sería sospechosa). Se reporta la diferencia pareada E1 − E0 por fila con un IC bootstrap 95 % por bloques de piloto-carrera.
+- *Contradice:* E1 ≥ E0, una mejora solo en una carrera, o E2 ≈ E1. Cualquiera de estos se reporta como resultado negativo sin cambiar el plan.
+- *No establece:* aunque mejore, no prueba un efecto causal del aire sucio ni sirve para decidir adelantamientos o paradas. Vale solo para la población `clean_pair` de R8–9.
+
+**Checks escritos antes de implementar (Hito 2):**
+
+| Check | Evidencia | Falla si |
+|---|---|---|
+| K1 Temporal | `assert` de que el `end_time_s` del auto usado es ≤ `end_time_s(t)` en cada fila (como F2) | algún timestamp es posterior al fin de t |
+| K2 Mismas filas | hash del set de `pair_id` de validación de E0/E1/E2 = `f453a98d…` y mismo orden | cambia el hash o el n ≠ 1.808 |
+| K3 Sin fuga | ninguna columna `next_*` ni `next_lap_s` entre los inputs (`make_model` lo bloquea) y la feature se calcula sin `clean_pair` | aparece una columna futura o la feature cambia al filtrar |
+| K4 Fit solo en train | la media del scaler para `gap_ahead_cap_s` = media de train (como C8) | coincide con la media de train+val |
+| K5 Faltantes | se cuentan las filas imputadas con el tope | > 0 en validación sin explicación |
+| K6 Placebo | la permutación se hace dentro de la carrera, con seed 414 y la misma distribución marginal | cambia la distribución o se usa otra seed |
+
+**Robustez (plan):** MAE por carrera de validación con conteos (R8 n = 1.066, R9 n = 742) para E0/E1/E2. MAE por tramo de gap (< 1 s, 1–2 s, 2–5 s, ≥ 5 s) con n de cada tramo. Análisis en la población amplia (`observed_pairs_train_validation_v1.csv`), reportado **aparte** de la comparación común. Errores por contexto y SHAP en el Hito 2.
 
 ## 5. Traceability and next steps  — [ambos]
 
 | Integrante | Decisiones/partes propias | Puede explicar |
 |---|---|---|
-| Valentín | | |
-| ________ | | |
+| Valentín Castro | §1 encuadre y límite `clean_pair`, §2 reproducción con 9 checks, `hito1_reference.py`, README y empaquetado | Por qué el scaler se ajusta solo con train (C8), por qué OLS gana solo en el 51,6 % de las filas, el porcentaje de `clean_pair` por carrera |
+| Camilo Bufadel | §3 hipótesis de tráfico, §4 plan de experimento, `hito1_feasibility_traffic.py`, segunda reproducción de la referencia en otra máquina | Por qué `gap_ahead_s` está disponible en t (F2), por qué se calcula antes del filtro `clean_pair`, para qué sirve el placebo, por qué la selección se hace con LORO en train y no con validación |
 
-- Registro de IA: ver DECISION_LOG.md
-- Revisión tras feedback:
-- Responsables antes del Hito 2:
-- Bloqueo conocido:
+- **Registro de IA:** ver `DECISION_LOG.md` (quién, para qué, qué se adoptó y cómo se verificó).
+- **Revisión tras feedback:** ver `DECISION_LOG.md` → "Revisión tras feedback".
+- **Antes del Hito 2 (19-11):** Camilo implementa E1/E2/S1 y los checks K1–K6 y hace la selección LORO en train. Valentín agrega MAE por carrera y por tramo de gap, IC bootstrap y SHAP. Ambos registran todos los intentos en `trials_log.csv`.
+- **Bloqueo conocido:** ninguno técnico. Pendiente confirmar con Ángel (12–13/11) si el auto que va en pit lane cruzando la línea debe contar como tráfico (es la sensibilidad S1).
