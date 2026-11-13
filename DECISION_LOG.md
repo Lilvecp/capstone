@@ -2,7 +2,7 @@
 
 | Fecha | Quién | Decisión | Evidencia | Cambio posterior / siguiente paso |
 |---|---|---|---|---|
-| 2026-11-11 | Equipo | Reparto del trabajo en dos mitades (ver REPARTO.md) | Rúbrica Hito 1 v2 | |
+| 2026-11-11 | Equipo | Reparto del trabajo en dos mitades: Valentín §1–2 y empaquetado; Camilo §3–4 | Rúbrica Hito 1 v2 | |
 | 2026-11-11 | Valentín | Script propio `hito1_reference.py` que reutiliza el helper del curso en vez de entregar solo `probar_referencia_v1.py` | La rúbrica pide reproducción propia; la salida del instructor no cuenta | Se agregaron 9 checks (SHA-256, conteos, rondas, `pair_id` disjuntos, orden temporal, solo clean, sin `next_*`, scaler ajustado solo en train, mismas filas) |
 | 2026-11-11 | Valentín | Reportar MAE por carrera y comparación pareada OLS vs persistencia | `salidas_hito1/paired_ols_vs_persistence.csv`: OLS −0,023 s, pero gana solo en el 51,6 % de las filas | La mejora de la referencia es modesta: cualquier extensión del Hito 2 debe compararse contra OLS en las mismas filas y por carrera |
 | 2026-11-11 | Valentín | Guardar el hash del set de `pair_id` de validación (`f453a98d…`) | `reference_run.json` | En el Hito 2, verificar que la extensión y la ablación usen exactamente ese set |
