@@ -1,0 +1,19 @@
+check,passed,detail
+K0a versión de datos (SHA-256),True,"{'train_clean_v1.csv': '43544f38cc9e', 'validation_clean_v1.csv': 'b19efb6a908a', 'nextlap_reference_v1.py': 'f6c58925cd4a'}"
+"K0b split por carrera: train R1–7, validación R8–9",True,"train=[1, 2, 3, 4, 5, 6, 7] val=[8, 9]"
+K0c conteos publicados,True,train=5772 val=1808
+K0d pair_id único y disjunto,True,train ∩ val = ∅
+K0e snapshots sin test,True,"[1, 2, 3, 4, 5, 6, 7, 8, 9]"
+K1 temporal: el auto usado cruzó antes o junto con el fin de t,True,max(end_time_ahead - end_time_t) = 0.000 s (≤ 0)
+K1b el auto usado nunca es el mismo piloto,True,
+K2a join por pair_id sin filas perdidas ni duplicadas,True,"train 5772→5772, val 1808→1808"
+K2b mismo set de validación que Hito 1 (hash),True,f453a98dc906904c
+K3a sin fuga: inputs sin next_* ni clean_pair,True,make_model bloquea next_*; clean_pair nunca entra en las listas de inputs (ver abajo)
+K3b la feature se construyó antes del filtro clean_pair,True,503 pares clean tendrían otro gap si se filtrara primero; aquí se usa la línea completa
+"K3c fin de t publicado = reconstruido, y auto usado ≤ fin de t",True,último timestamp usado ≤ fin de t en cada par
+K5 faltantes contados (regla: tope 5 s),True,"[{'population': 'train R1-7', 'gap_missing': 0, 'gap_nopit_missing': 0}, {'population': 'validation R8-9', 'gap_missing': 0, 'gap_nopit_missing': 0}]"
+"K6 placebo: misma distribución por carrera, seed 414",True,permutación dentro de carrera
+K4 preprocesamiento ajustado solo con train (media del scaler para la feature),True,scaler=2.7812 train=2.7812 train+val=2.7875
+K7 E0 reproduce el OLS de Hito 1,True,0.386707
+"K8 predicciones finitas, mismas 1.808 filas para todas las versiones",True,1 predicción por versión y pair_id
+K9 MAE global = promedio de R8/R9 ponderado por n,True,"{'control_MAE_s': np.float64(0.386707), 'candidate_MAE_s': np.float64(0.38705)}"

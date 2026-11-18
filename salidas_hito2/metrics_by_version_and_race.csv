@@ -1,0 +1,13 @@
+version,population,n,MAE_s
+E0_reference_ols,all_validation,1808,0.38670695036404307
+E0_reference_ols,R8 Austrian Grand Prix,1066,0.3735705571218994
+E0_reference_ols,R9 British Grand Prix,742,0.40557945062836276
+E1_candidate,all_validation,1808,0.38704970487383716
+E1_candidate,R8 Austrian Grand Prix,1066,0.37549247874624364
+E1_candidate,R9 British Grand Prix,742,0.4036534825719702
+E2_placebo,all_validation,1808,0.3867847825431219
+E2_placebo,R8 Austrian Grand Prix,1066,0.3733872717366624
+E2_placebo,R9 British Grand Prix,742,0.4060324193621053
+S1_sensitivity_nopit,all_validation,1808,0.3873137382086611
+S1_sensitivity_nopit,R8 Austrian Grand Prix,1066,0.3758513652232854
+S1_sensitivity_nopit,R9 British Grand Prix,742,0.40378124441137053

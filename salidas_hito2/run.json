@@ -1,0 +1,68 @@
+{
+  "script": "hito2_experiment.py",
+  "random_seed": 414,
+  "train_rounds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "validation_rounds": [
+    8,
+    9
+  ],
+  "n_train": 5772,
+  "n_validation": 1808,
+  "n_validation_by_round": {
+    "8": 1066,
+    "9": 742
+  },
+  "validation_pair_id_set_sha256": "f453a98dc906904cba7307f7e25b67fbd9c9087df0a92a87477cf63422b76a57",
+  "selection": {
+    "rule": "E1b only if its LORO mean MAE is lower than E1 by more than 0.005 s",
+    "loro_mean_MAE_s": {
+      "E0_reference": 0.508386,
+      "E1_gap_cap5": 0.50858,
+      "E1b_gap_lt1": 0.507992
+    },
+    "chosen": "E1_gap_cap5",
+    "candidate_feature": "gap_ahead_cap_s"
+  },
+  "bootstrap_control_minus_candidate": {
+    "control_minus_candidate_s": -0.0003427545097940965,
+    "ci95_low_s": -0.0027089574110580094,
+    "ci95_high_s": 0.0020891189773346464,
+    "blocks": 43,
+    "resamples": 2000,
+    "seed": 414,
+    "block_definition": "round-driver"
+  },
+  "data_sha256": {
+    "train_clean_v1.csv": "43544f38cc9ef32b44886e6751e03522601265160086fe3a4956f04b87bd5c13",
+    "validation_clean_v1.csv": "b19efb6a908af12a5d2c6bdde29aa40984295e62ce0f187a201b579278db7ee8",
+    "nextlap_reference_v1.py": "f6c58925cd4a477bf3e1a5a2b3968e67df3a1cffabecee9e89701c3ac2d5f994"
+  },
+  "snapshots_manifest_events": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "test_data_used": false,
+  "environment": {
+    "python": "3.12.10",
+    "numpy": "2.5.4",
+    "pandas": "3.1.1",
+    "sklearn": "1.9.1",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  },
+  "checks_passed": 18
+}

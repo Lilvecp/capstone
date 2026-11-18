@@ -1,0 +1,5 @@
+role,version,model_and_inputs,n,MAE_s,output
+OLS reference + matched control (shared run),E0_reference_ols,"OLS · 6 published inputs (also the matched control: same OLS, same rows, without the traffic input)",1808,0.38670695036404307,salidas_hito2/validation_predictions.csv · col pred_E0_reference_ols
+Candidate,E1_candidate,OLS · 6 inputs + gap_ahead_cap_s,1808,0.38704970487383716,salidas_hito2/validation_predictions.csv · col pred_E1_candidate
+Placebo control,E2_placebo,OLS · 6 inputs + gap_ahead_cap_s permuted within race (seed 414),1808,0.3867847825431219,salidas_hito2/validation_predictions.csv · col pred_E2_placebo
+Sensitivity,S1_sensitivity_nopit,OLS · 6 inputs + gap_ahead_nopit_cap_s,1808,0.3873137382086611,salidas_hito2/validation_predictions.csv · col pred_S1_sensitivity_nopit

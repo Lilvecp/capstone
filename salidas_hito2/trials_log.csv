@@ -1,0 +1,8 @@
+stage,variant,inputs,model,rows,MAE_s,metric_note,used_validation,who
+selection LORO train R1-7,E0_reference,(6 ref),OLS make_model,"train held-out rounds, n=5772",0.5083861760362715,mean of 7 held-out-race MAEs,False,Valentín
+selection LORO train R1-7,E1_gap_cap5,gap_ahead_cap_s,OLS make_model,"train held-out rounds, n=5772",0.5085802441322859,mean of 7 held-out-race MAEs,False,Valentín
+selection LORO train R1-7,E1b_gap_lt1,gap_lt_1s,OLS make_model,"train held-out rounds, n=5772",0.5079920032799922,mean of 7 held-out-race MAEs,False,Valentín
+validation R8-9 (single use),E0_reference_ols,(6 ref),OLS make_model,validation n=1808 (hash f453a98d…),0.38670695036404307,pooled validation MAE,True,Valentín
+validation R8-9 (single use),E1_candidate,gap_ahead_cap_s,OLS make_model,validation n=1808 (hash f453a98d…),0.38704970487383716,pooled validation MAE,True,Valentín
+validation R8-9 (single use),E2_placebo,placebo_feature,OLS make_model,validation n=1808 (hash f453a98d…),0.3867847825431219,pooled validation MAE,True,Valentín
+validation R8-9 (single use),S1_sensitivity_nopit,gap_ahead_nopit_cap_s,OLS make_model,validation n=1808 (hash f453a98d…),0.3873137382086611,pooled validation MAE,True,Valentín

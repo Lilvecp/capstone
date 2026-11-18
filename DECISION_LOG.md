@@ -40,3 +40,37 @@
 - Camilo: implementar E1/E2/S1 con los checks K1–K6, la selección LORO en train y `trials_log.csv`.
 - Valentín: MAE por carrera y por tramo de gap con conteos, IC bootstrap de la diferencia pareada, población amplia por separado y SHAP.
 - Bloqueo conocido: ninguno técnico. Pendiente consultar con Ángel cómo tratar los autos en pit lane (S1).
+
+---
+
+# DECISION_LOG · Hito 2
+
+| Fecha | Quién | Decisión | Evidencia | Cambio posterior / siguiente paso |
+|---|---|---|---|---|
+| 2026-11-18 | Equipo | Reparto Hito 2: Valentín = pipeline del experimento (feature, referencia, candidato, control pareado, placebo, S1, checks, reproducibilidad); Camilo = errores por contexto (§2) y SHAP (§3) sobre esas salidas | Rúbrica Hito 2 v2 (C1–C3, C7 / C4–C6) | Cambia el plan del Hito 1 (allí Camilo implementaba E1/E2/S1): se invirtió para que el análisis de errores y SHAP lo haga quien no escribió el pipeline |
+| 2026-11-18 | Valentín | Usar el OLS de referencia como control pareado (candidato = mismo OLS + 1 columna) | Brief §1: "the OLS reference also serves as the matched control" | Una sola corrida E0 cumple ambos roles (`comparison_table.csv`) |
+| 2026-11-18 | Valentín | Selección E1 vs E1b con LORO en train antes de mirar validación | `selection_loro_train.csv`: E0 0,50839 · E1 0,50858 · E1b 0,50799 s → E1 por la regla de 0,005 s | Ya en train E1 no mejoraba a E0 (trial no exitoso, registrado) |
+| 2026-11-18 | Valentín | Validación una sola vez: E0, E1, E2 placebo, S1 | `comparison_table.csv`: 0,38671 / 0,38705 / 0,38678 / 0,38731 s | — |
+| 2026-11-18 | Valentín | **Descartar `gap_ahead_cap_s`** y retener la referencia de 6 inputs | Control − candidato = −0,00034 s, IC 95 % [−0,0027; +0,0021] (`run.json`); R8 −0,0019, R9 +0,0019; criterios "apoya" del Hito 1 no se cumplen | Siguiente check: gap promedio de las últimas 2–3 vueltas (tráfico persistente, disponible en t) en el mismo protocolo |
+| 2026-11-18 | Valentín | Revisar el check K3 ("falla si la feature cambia al filtrar") | Al implementarlo, 503 pares clean cambian de gap si se filtra primero: eso confirma que hay que calcular antes del filtro, no es una falla | Se conserva K3 original en HITO2 §1 y se reemplaza por K3b/K3c; se agregan K0, K7, K8, K9 |
+| 2026-11-18 | Valentín | S1 implementado con el auto de adelante que no está en vuelta de pit in/out | MAE S1 0,38731 s: no cambia la conclusión | Duda de Hito 1 sobre autos en pit lane queda resuelta para este resultado |
+
+## Revisión tras feedback (Hito 1 → Hito 2)
+
+- Feedback C1.3 (instructor, Hito 1): "clean_pair does not independently exclude strong traffic".
+- Entrada original (HITO1 §1): "Las vueltas con safety car, pit o tráfico fuerte quedan fuera".
+- Verificación: el 18,1 % de los pares de validación (328/1.808) y el 22,9 % de train tienen un auto a < 1 s (`salidas_hito2/feature_coverage.csv`, `mae_by_gap_bin.csv`).
+- Cambio: la afirmación se corrige en HITO2 §0 (y en el informe final): `clean_pair` excluye pit, banderas, vueltas no precisas/borradas y cambio de stint, **no** tráfico. El análisis por tramo de gap se mantiene (HITO2 §1).
+
+## Uso de IA · Hito 2
+
+| Quién | Herramienta | Para qué | Qué se adoptó / cambió | Cómo se verificó |
+|---|---|---|---|---|
+| Valentín | Claude | Utilicé Claude como apoyo para organizar mis ideas, revisar los requisitos del Hito 2 y facilitar la implementación del código y la redacción. Yo definí cómo dividir el trabajo con Camilo, qué experimentos realizar y cómo presentar los resultados.
+Decidí mantener el OLS de referencia como control y evaluar el aporte de la variable de tráfico. Con apoyo de Claude implementé el script hito2_experiment.py, los checks K0–K9 y el bootstrap por bloques. Mantuve los criterios establecidos en el Hito 1, incluyendo la feature, el tope de 5 s y la regla de selección.Ejecuté el script en mi computador y comprobé que E0 reprodujera el MAE del Hito 1 (0,386707 s, K7). También verifiqué el MAE global mediante el promedio ponderado de R8 y R9 (K9), y contrasté las cifras de HITO2 §1 con los archivos CSV generados.|
+| Camilo | *(completar)* | | | |
+
+## Contribuciones reales · Hito 2
+
+- Valentín: `hito2_experiment.py` (feature, selección LORO, E0/E1/E2/S1, checks K0–K9, predicciones por `pair_id`, bootstrap, tramos de gap); HITO2 §0, §1, §4; README Hito 2; corrección C1.3. Puede explicar: por qué E0 es el control pareado, por qué la diferencia negativa descarta la feature y por qué K3 se revisó.
+- Camilo: *(completar: HITO2 §2 errores por contexto, §3 SHAP, script/salidas SHAP)*.
