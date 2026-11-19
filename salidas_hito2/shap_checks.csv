@@ -1,0 +1,14 @@
+check,passed,detail
+S0 fondo solo de train (R1–7) y validación R8–9,True,"train=[1, 2, 3, 4, 5, 6, 7] val=[8, 9] n_val=1808"
+S0b mismas filas y orden que validation_predictions.csv,True,pair_id
+S1 E0_reference_ols.joblib reproduce pred_E0_reference_ols,True,máx |dif| = 0.00e+00 s
+S1 E1_candidate.joblib reproduce pred_E1_candidate,True,máx |dif| = 0.00e+00 s
+S2 |error| a mano = abs_err_* publicado,True,2026-R8-3-L10
+S3 E0_reference_ols: base + suma SHAP = predicción (1.808 filas),True,máx |dif| = 1.42e-14 s
+S4 E0_reference_ols: SHAP = coef·(x − media fondo) recalculado a mano,True,máx |dif| = 0.00e+00
+S5 E0_reference_ols: base value = predicción media del fondo,True,|dif| = 0.00e+00 s
+S6 E0_reference_ols: caso 2026-R8-3-L10 base + suma = predicción,True,72.707768 vs 72.707768
+S3 E1_candidate: base + suma SHAP = predicción (1.808 filas),True,máx |dif| = 1.42e-14 s
+S4 E1_candidate: SHAP = coef·(x − media fondo) recalculado a mano,True,máx |dif| = 0.00e+00
+S5 E1_candidate: base value = predicción media del fondo,True,|dif| = 1.42e-14 s
+S6 E1_candidate: caso 2026-R8-3-L10 base + suma = predicción,True,72.663306 vs 72.663306

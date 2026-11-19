@@ -64,6 +64,7 @@ Repo: https://github.com/Lilvecp/capstone · Commit entregado: ver tag `Hito2` y
 ```bash
 source .venv/bin/activate && pip install -r requirements.txt
 python hito2_experiment.py      # → salidas_hito2/, termina con "18 checks OK"
+python hito2_shap.py            # → salidas_hito2/shap_*, termina con "13 checks OK" (§2 caso + §3 SHAP)
 ```
 
 Mismos datos que el Hito 1 (`base_NextLap/`, SHA-256 arriba). Versiones exactas de la corrida: `salidas_hito2/run.json` → `environment`.
@@ -75,7 +76,8 @@ Mismos datos que el Hito 1 (`base_NextLap/`, SHA-256 arriba). Versiones exactas 
 | 1 · Checks K0–K9 (split, fit solo train, disponibilidad en t, mismas filas) | `salidas_hito2/checks.csv` | `hito2_experiment.py` §1–4 |
 | 1 · Feature, cobertura y faltantes | `salidas_hito2/feature_coverage.csv` · `train_features.csv` · `validation_features.csv` | `hito2_experiment.py` §2 |
 | 1 · Selección en train (LORO) y trials | `salidas_hito2/selection_loro_train.csv` · `trials_log.csv` | `hito2_experiment.py` §3 |
-| 2 · Errores por carrera y por tramo de gap | `HITO2.md` §2 · `control_vs_candidate_by_race.csv` · `mae_by_gap_bin.csv` | `hito2_experiment.py` §4 (+ análisis de Camilo) |
-| 3 · SHAP local y global | `HITO2.md` §3 · *(salidas de Camilo)* · modelos en `salidas_hito2/models/*.joblib` | *(script SHAP de Camilo)* |
+| 2 · Errores por carrera y por tramo de gap | `HITO2.md` §2 · `control_vs_candidate_by_race.csv` · `mae_by_gap_bin.csv` | `hito2_experiment.py` §4 |
+| 2 · Caso real por `pair_id` y desplazamiento E1 − E0 por tramo | `salidas_hito2/shap_case_error.csv` · `shap_context_by_gap_bin.csv` | `hito2_shap.py` §2 |
+| 3 · SHAP local y global (E0; E1 aparte) | `HITO2.md` §3 · `salidas_hito2/shap_local.csv` · `shap_global.csv` · `shap_checks.csv` · `shap_run.json` (explainer, fondo, versiones) | `hito2_shap.py` §3 |
 | 4 · Decisiones, IA y contribuciones | `DECISION_LOG.md` §Hito 2 · `HITO2.md` §5 | — |
 | Referencia del Hito 1 reutilizada | `salidas_hito1/` (`hito1_reference.py`); E0 la reproduce (check K7) | `hito1_reference.py` |

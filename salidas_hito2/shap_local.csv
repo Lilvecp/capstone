@@ -1,0 +1,24 @@
+model,pair_id,input,value,shap_s
+E0_reference_ols,2026-R8-3-L10,current_lap_s,72.875,-6.404361644046764
+E0_reference_ols,2026-R8-3-L10,recent_mean_s,72.60966666666667,-8.04619400383423
+E0_reference_ols,2026-R8-3-L10,current_lap_number,10.0,-0.0009331010145694532
+E0_reference_ols,2026-R8-3-L10,current_tyre_life,10.0,-0.025937090360964078
+E0_reference_ols,2026-R8-3-L10,current_compound,MEDIUM,-0.005472213495836896
+E0_reference_ols,2026-R8-3-L10,current_team,Red Bull Racing,-0.01448575311202167
+E0_reference_ols,2026-R8-3-L10,[base value],,87.20515202258612
+E0_reference_ols,2026-R8-3-L10,[base + suma],,72.70776821672173
+E0_reference_ols,2026-R8-3-L10,[predicción modelo],,72.70776821672173
+E0_reference_ols,2026-R8-3-L10,[observado y_true_s],,74.413
+E0_reference_ols,2026-R8-3-L10,[|error| aparte],,1.7052317832782649
+E1_candidate,2026-R8-3-L10,current_lap_s,72.875,-6.514992403549902
+E1_candidate,2026-R8-3-L10,recent_mean_s,72.60966666666667,-7.941538607854922
+E1_candidate,2026-R8-3-L10,current_lap_number,10.0,0.008482978900464658
+E1_candidate,2026-R8-3-L10,current_tyre_life,10.0,-0.024063015146549602
+E1_candidate,2026-R8-3-L10,gap_ahead_cap_s,0.6439999999993233,-0.05089667596609989
+E1_candidate,2026-R8-3-L10,current_compound,MEDIUM,-0.0077493910713331005
+E1_candidate,2026-R8-3-L10,current_team,Red Bull Racing,-0.009955272620253832
+E1_candidate,2026-R8-3-L10,[base value],,87.20401803818382
+E1_candidate,2026-R8-3-L10,[base + suma],,72.66330565087523
+E1_candidate,2026-R8-3-L10,[predicción modelo],,72.66330565087523
+E1_candidate,2026-R8-3-L10,[observado y_true_s],,74.413
+E1_candidate,2026-R8-3-L10,[|error| aparte],,1.7496943491247663

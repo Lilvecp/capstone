@@ -1,0 +1,2 @@
+pair_id,event_name,driver_number,current_lap_number,current_lap_s,gap_ahead_s,y_true_s,pred_E0_reference_ols,pred_E1_candidate,abs_err_E0_hand,abs_err_E1_hand,control_minus_candidate_s
+2026-R8-3-L10,Austrian Grand Prix,3,10.0,72.875,0.6439999999993233,74.413,72.70776821672173,72.66330565087523,1.7052317832782649,1.7496943491247663,-0.044462565846501434

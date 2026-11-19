@@ -1,0 +1,29 @@
+{
+  "explainer": "shap.LinearExplainer (masker Independent = interventional) sobre la regresión OLS ya preprocesada",
+  "background": "1000 filas de train_features.csv (R1–7), sample(random_state=414), transformadas con model.named_steps['prepare'] (ajustado solo con train)",
+  "local_case": "2026-R8-3-L10",
+  "global_sample": "las 1.808 filas de validación R8–9 (validation_features.csv), sin muestreo",
+  "aggregation": "columnas numeric__*/category__* sumadas a su input original; global = media |SHAP| por input",
+  "units": "segundos de next_lap_s",
+  "models": {
+    "E0_reference_ols": {
+      "label": "E0 referencia (retenido)",
+      "base_value_s": 87.20515202258612,
+      "n_encoded_columns": 18
+    },
+    "E1_candidate": {
+      "label": "E1 candidato (+gap)",
+      "base_value_s": 87.20401803818382,
+      "n_encoded_columns": 19
+    }
+  },
+  "checks_passed": 13,
+  "environment": {
+    "python": "3.12.13",
+    "numpy": "2.5.5",
+    "pandas": "3.1.1",
+    "sklearn": "1.9.1",
+    "shap": "0.54.1",
+    "platform": "macOS-26.5.2-arm64-arm-64bit"
+  }
+}
