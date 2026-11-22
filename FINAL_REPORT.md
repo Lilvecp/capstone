@@ -68,15 +68,112 @@ Las diferencias se recalculan desde las predicciones por fila y el global coinci
 
 **Alcance:** OLS lineal, representaciones con tope 5 s, población `clean_pair`, dos carreras de validación. No prueba que el tráfico no importe; prueba que **estas** representaciones no mejoran la referencia aquí. Por lo mismo, **no nominamos candidato al bono** de mejora: la ganancia de E4 (+0,006 ms) está dentro del ruido y no cumple nuestros propios criterios.
 
-## 3. Errores por contexto  — [Camilo · PENDIENTE]
+## 3. Errores por contexto  — [Camilo]
 
-> Insumos listos: `salidas_hito2/control_vs_candidate_by_race.csv` (E0 vs E1), `salidas_final/control_vs_candidate_by_race_final.csv` (E0 vs E3a, E0 vs E4, E1 vs E4), `validation_predictions_final.csv`, `mae_by_gap_bin_final.csv`, `mae_by_samelap_gap_bin_E4.csv`, `ahead_car_other_lap_by_round.csv`.
-> Falta: (3a) tabla R8/R9 con n, MAE y control − candidato para el candidato final que discutan (sugerencia: E4 vs E0 y E1 vs E0) y su relación con el global ponderado por n; (3b) caso inspeccionado (`2026-R8-3-L10` u otro) con observado, predicción y |error| verificado; (3c) limitación observada + siguiente check concreto. Dato útil: en el 32,9 % de los pares de validación el "auto de adelante" del Hito 2 iba en otra vuelta (Canadá 48,7 % en train).
+Comando: `python final_errors.py` (después de `final_experiment.py`; lee sus predicciones, no reajusta modelos) → `salidas_final/errors_by_race_E1_E4.csv`, `errors_by_ahead_type.csv`, `errors_cases.csv`, `errors_checks.csv` (12 checks OK). Es un análisis **descriptivo** sobre validación: la decisión de §2 ya estaba tomada con los criterios pre-registrados.
 
-## 4. Interpretación del modelo (SHAP)  — [Camilo · PENDIENTE]
+### 3a. Por carrera (C3a)
 
-> Insumos: `hito2_shap.py`, `salidas_hito2/shap_*`. Modelo retenido = E0.
-> Falta: (4a) SHAP local de E0 con base + contribuciones = predicción y el |error| aparte; **corregir** la lectura del Hito 2 según el feedback: en Austria el SHAP del gap en E1 (−50,9 ms) se mide respecto de la base de E1; el cambio E1 − E0 de la predicción es −44,5 ms y también refleja el reajuste del modelo (no son la misma cantidad). (4b) SHAP global: muestra, explainer, fondo de train y alcance.
+Control − candidato (positivo = el candidato tiene menor MAE). Mismas 1.808 filas.
+
+| Contraste | Carrera | n | MAE control (s) | MAE candidato (s) | Control − candidato | Filas donde gana el candidato |
+|---|---|---|---|---|---|---|
+| E0 − E1 (gap Hito 2) | R8 Austria | 1.066 | 0,37357 | 0,37549 | −1,92 ms | 47,5 % |
+| | R9 Gran Bretaña | 742 | 0,40558 | 0,40365 | +1,93 ms | 50,8 % |
+| | **Global** | 1.808 | 0,38671 | 0,38705 | **−0,34 ms** | 48,8 % |
+| E0 − E4 (gap misma vuelta) | R8 Austria | 1.066 | 0,37357 | 0,37394 | −0,37 ms | 48,6 % |
+| | R9 Gran Bretaña | 742 | 0,40558 | 0,40503 | +0,55 ms | 52,0 % |
+| | **Global** | 1.808 | 0,38671 | 0,38670 | **+0,006 ms** | 50,0 % |
+
+**Relación con el global.** El global es el promedio de R8 y R9 ponderado por n (check C1): para E4, (1.066 · −0,370 + 742 · +0,546) / 1.808 = +0,006 ms. En los dos candidatos el patrón es el mismo: **R8 favorece al control, R9 al candidato**, y el global queda cerca de 0 porque las dos carreras se compensan, no porque se parezcan. Restringir el gap a la misma vuelta (E4) reduce la magnitud de ambas diferencias (de ±1,9 ms a −0,4/+0,5 ms), pero no cambia el signo por carrera. Ningún candidato mejora en las dos carreras, y todas las diferencias son menores al 0,5 % de un MAE de ~0,39 s.
+
+### 3b. Casos inspeccionados (C3b)
+
+| | `2026-R8-3-L10` | `2026-R8-81-L69` |
+|---|---|---|
+| Contexto | Austria, piloto 3 (Red Bull), vuelta 10 → 11 | Austria, piloto 81 (McLaren), vuelta 69 → 70 |
+| Auto de adelante (Hito 2) | **misma vuelta**, a 0,644 s | **otra vuelta**: Williams (23) completando la vuelta 67, a 0,237 s: el piloto lo está doblando |
+| Gap misma vuelta (E4) | 0,644 s (mismo auto) | 15,863 s → tope 5 s |
+| Observado t+1 (`y_true_s`) | 74,413 | 73,065 |
+| E0: predicción → \|error\| | 72,708 → \|74,413 − 72,708\| = **1,705** | 72,385 → \|73,065 − 72,385\| = **0,680** |
+| E1: predicción → \|error\| | 72,663 → **1,750** | 72,302 → **0,763** |
+| E4: predicción → \|error\| | 72,699 → **1,714** | 72,385 → **0,680** |
+
+Las restas coinciden con `abs_err_*` de `validation_predictions_final.csv` (check C5). **Lectura.** En `2026-R8-81-L69`, E1 trata a un doblado a 0,24 s como tráfico, baja la predicción 0,083 s y empeora el error. E4 ignora a ese auto (lo trata como aire libre) y vuelve exactamente al error de E0: es el problema señalado en la Demo, corregido. En `2026-R8-3-L10` el auto de adelante iba en la misma vuelta, así que E4 usa el mismo gap que E1: la predicción baja menos (−0,009 s frente a −0,044 s), porque E4 tiene otro coeficiente, pero sigue moviéndose hacia "más rápido" cuando la vuelta real fue 1,5 s más lenta. Ninguno de los tres modelos anticipa esa pérdida.
+
+### 3c. Limitación observada y siguiente check (C3c)
+
+Separando el "auto de adelante" del Hito 2 según su vuelta (`errors_by_ahead_type.csv`, n de validación):
+
+| Auto de adelante (gap < 2 s) | n | MAE E0 (s) | E0 − E1 | E0 − E4 | t+1 más lenta que E0 |
+|---|---|---|---|---|---|
+| Misma vuelta | 596 | 0,373 | −6,2 ms | −0,9 ms | 58 % |
+| Otra vuelta: el piloto **dobla** a un atrasado | 89 | 0,247 | −14,4 ms | +0,2 ms | 62 % |
+| Otra vuelta: al piloto **lo dobla** uno adelantado | 82 | **0,960** | **+19,4 ms** | −1,3 ms | **24 %** |
+
+Tres observaciones:
+1. **En la misma vuelta (pelea real), ningún gap ayuda:** E1 y E4 empeoran a E0, sobre todo con gap < 1 s (E4 −1,2 ms, n = 273). En esa población el gap sigue sin distinguir "voy a adelantar" de "quedo atascado".
+2. **Doblar a un atrasado** no es tráfico que cueste tiempo (MAE 0,25 s, el más bajo). E1 lo trataba como tráfico y empeoraba 14 ms; E4 lo corrige. Esto confirma el problema de la Demo.
+3. **Ser doblado por un líder** es el contexto con el **mayor error de E0 (0,96 s, 2,6 veces el de la misma vuelta)**. Ahí la vuelta t+1 fue **más rápida** que lo predicho en el 76 % de los casos: la vuelta t probablemente incluyó ceder el paso, y E0, que repite el ritmo de t, sobreestima t+1. E1 bajaba la predicción y ganaba 19 ms en esas filas. **E4, al tratar a ese auto como "aire libre", pierde justamente esa información.** Por eso E4 elimina el daño de E1 sin superar a E0: corrige un caso y borra el otro.
+
+**Limitación.** E4 trata igual dos situaciones opuestas en "otra vuelta" (doblar y ser doblado). El mayor error del modelo está concentrado en un grupo chico (82 filas, 4,5 % de validación) y en dos carreras, así que el patrón puede no repetirse en otras.
+
+**Siguiente check (mismo protocolo).** Pre-registrar un indicador disponible en t: `being_lapped = 1` si el auto que cruzó justo antes, a menos de 2 s, va en una vuelta **mayor** que la del piloto (todo se calcula con `lap_number` y `end_time_s ≤ end_time_s(t)`). E5 = E0 + `gap_samelap_cap_s` + `being_lapped`, con selección LORO en R1–R7 y control pareado E4. Antes de mirar validación, verificar en R1–R7 que el grupo existe en cantidad suficiente y que E0 también comete ahí sus mayores errores. Si E5 no mejora en R8 **y** R9, se descarta igual.
+
+## 4. Interpretación del modelo (SHAP)  — [Camilo]
+
+Comando: `python hito2_shap.py` → `salidas_hito2/shap_local.csv`, `shap_global.csv`, `shap_checks.csv` (13 checks), `shap_run.json`. **Modelo explicado: E0**, el modelo retenido en §2c. E1 se reporta aparte solo para medir el peso del gap.
+
+**Configuración.** `shap.LinearExplainer` (masker `Independent`) sobre la regresión ya preprocesada. **Fondo:** 1.000 filas de train R1–R7 (`sample(random_state=414)`), transformadas con el `prepare` ajustado solo con train. Las columnas one-hot se suman de vuelta a su input original (`current_compound`, `current_team`). Unidades: segundos de `next_lap_s`. Versiones: Python 3.12.13, sklearn 1.9.1, shap 0.54.1.
+
+### 4a. Local: `2026-R8-3-L10` con E0 (C4a)
+
+| Input | Valor | SHAP E0 (s) |
+|---|---|---|
+| **Base** (predicción media sobre el fondo R1–R7) | — | **87,2052** |
+| `recent_mean_s` | 72,610 | −8,0462 |
+| `current_lap_s` | 72,875 | −6,4044 |
+| `current_tyre_life` | 10 | −0,0259 |
+| `current_team` | Red Bull Racing | −0,0145 |
+| `current_compound` | MEDIUM | −0,0055 |
+| `current_lap_number` | 10 | −0,0009 |
+| **Base + suma** | | **72,7078** = predicción de E0 ✓ (diferencia < 1e-6 s en las 1.808 filas, check S6) |
+| *Aparte:* observado / \|error\| | | 74,413 / 1,705 |
+
+**Lectura (asociación del modelo, no causalidad).** La base de 87,2 s mezcla circuitos más largos que Austria. Casi todo el descenso hasta 72,7 s (−14,45 s) viene de los dos inputs de ritmo: el modelo reconoce el **nivel de Austria y de este piloto**, no una dinámica propia de la vuelta. Neumático, equipo y compuesto mueven menos de 0,03 s cada uno. Ninguna contribución empuja hacia una vuelta más lenta, así que E0 no tenía con qué anticipar los +1,54 s observados. El \|error\| se reporta aparte porque SHAP explica la predicción, no el error.
+
+**Corrección del Hito 2 (feedback).** En HITO2 §3 escribimos que la contribución del gap en E1 (−50,9 ms) "es lo que baja la predicción a 72,663". Eso mezclaba dos cantidades distintas:
+
+| | E0 (s) | E1 (s) | E1 − E0 (ms) |
+|---|---|---|---|
+| Base | 87,2052 | 87,2040 | −1,1 |
+| `current_lap_s` | −6,4044 | −6,5150 | −110,6 |
+| `recent_mean_s` | −8,0462 | −7,9415 | +104,7 |
+| `gap_ahead_cap_s` | — | −0,0509 | −50,9 |
+| Resto (neumático, equipo, compuesto, n.º de vuelta) | −0,0468 | −0,0333 | +13,5 |
+| **Predicción** | **72,7078** | **72,6633** | **−44,5** |
+
+El −50,9 ms es la contribución del gap **dentro de E1, respecto de la base de E1** (el gap de esta fila, 0,644 s, frente al gap medio del fondo). El cambio de predicción E1 − E0 es −44,5 ms y **no es la misma cantidad**: al agregar la columna, el OLS se reajusta y cambian todos los coeficientes y la base. En esta fila, `current_lap_s` y `recent_mean_s` se redistribuyen ±105–111 ms entre sí y el resto aporta +13,5 ms. La lectura correcta es: *"en E1 el gap contribuye −50,9 ms respecto de la base de E1; la predicción de E1 queda 44,5 ms por debajo de la de E0, como efecto conjunto de la nueva columna y del reajuste"*.
+
+### 4b. Global: media \|SHAP\| sobre las 1.808 filas de validación (C4b)
+
+| Rank | Input (E0) | Media \|SHAP\| (s) | % | | Input (E1) | Media \|SHAP\| (s) |
+|---|---|---|---|---|---|---|
+| 1 | `recent_mean_s` | 6,509 | 54,7 % | | `recent_mean_s` | 6,424 |
+| 2 | `current_lap_s` | 5,273 | 44,3 % | | `current_lap_s` | 5,364 |
+| 3 | `current_compound` | 0,048 | 0,4 % | | `current_compound` | 0,048 |
+| 4 | `current_team` | 0,033 | 0,3 % | | `gap_ahead_cap_s` | 0,037 |
+| 5 | `current_tyre_life` | 0,028 | 0,2 % | | `current_team` | 0,033 |
+| 6 | `current_lap_number` | 0,001 | 0,0 % | | `current_tyre_life` | 0,026 |
+| 7 | | | | | `current_lap_number` | 0,007 |
+
+**Muestra y agregación:** todas las filas de validación R8–R9 `clean_pair`, sin muestreo; media del valor absoluto por input original. **Lectura:** E0 se apoya en un 99 % en los dos inputs de ritmo; es una persistencia suavizada, coherente con los coeficientes del Hito 1. En E1 el gap mueve la predicción 0,037 s en promedio, un orden de magnitud menos que el MAE, y aun así no la mejora (§2).
+
+**Alcance.**
+1. Solo esta muestra y este fondo: como la base mezcla circuitos de R1–R7, gran parte de la \|SHAP\| de los inputs de ritmo es "nivel del circuito frente al fondo"; con un fondo del mismo circuito las magnitudes cambiarían.
+2. SHAP describe en qué se apoya el **modelo**, no qué causa el tiempo de vuelta.
+3. Una contribución mayor que 0 no prueba menor error.
+4. El masker `Independent` reparte de forma convencional el peso entre `current_lap_s` y `recent_mean_s`, que están muy correlacionados. Por eso su reparto entre E0 y E1 (±105–111 ms en el caso) no tiene interpretación propia.
 
 ## 5. Reproducibilidad y decisiones  — [Valentín]
 
@@ -87,19 +184,19 @@ Las diferencias se recalculan desde las predicciones por fila y el global coinci
 | Datos | `base_NextLap/` = release `IIT414W_Capstone_NextLap_StudentData_v1.zip` sin cambios; SHA-256 en `README.md`, verificados en cada corrida (K0a/F0a) y snapshots contra `source_manifest_v2.json` |
 | Entorno | `requirements.txt` (numpy, pandas, scikit-learn, joblib, shap); versiones exactas en `salidas_hito2/run.json`, `salidas_hito2/shap_run.json` y `salidas_final/run_final.json` → `environment` |
 | Seed | `RANDOM_SEED = 414` (placebo, bootstrap, fondo SHAP); OLS es determinista |
-| Comandos (desde la raíz, en orden) | `python hito1_reference.py` → `python hito2_experiment.py` → `python hito2_shap.py` → `python final_experiment.py` |
+| Comandos (desde la raíz, en orden) | `python hito1_reference.py` → `python hito2_experiment.py` → `python hito2_shap.py` → `python final_experiment.py` → `python final_errors.py` |
 | Salidas | `salidas_hito1/`, `salidas_hito2/`, `salidas_final/` (tabla código → salida en `README.md`) |
 
 ### 5b. Registro de decisiones (C5b)
 `DECISION_LOG.md` enlaza cada trial con su configuración y resultado, incluidos los no exitosos: `salidas_hito2/trials_log.csv` (7 corridas) y `salidas_final/trials_log_final.csv` (5 LORO en train + 4 en validación). Decisiones con evidencia por integrante:
 - **Valentín:** usar E0 como control pareado de todos los candidatos (C2a); descartar E1 (C2c, IC y placebo); pre-registrar y ejecutar E3a y E4 con selección en R1–R7; acotar el placebo con 200 permutaciones; no nominar al bono.
-- **Camilo:** elegir explicar E0 con SHAP por ser el modelo retenido; el caso `2026-R8-3-L10` y el análisis del desplazamiento por tramo de gap que llevó al siguiente check (cambio del gap); *(completar con su decisión del informe final)*.
+- **Camilo:** elegir explicar E0 con SHAP por ser el modelo retenido; el caso `2026-R8-3-L10` y el análisis del desplazamiento por tramo de gap que llevó al siguiente check (cambio del gap). En el informe final: separar el "auto en otra vuelta" según si el piloto **dobla** o **es doblado** (§3c, `final_errors.py`). Así se ve por qué E4 no mejora a E0: corrige el caso del doblado y borra la información del caso en que un líder dobla al piloto, que es donde E0 tiene su mayor error (0,96 s). De ahí sale el siguiente check propuesto, `being_lapped`. También corregir la lectura SHAP del Hito 2 separando la contribución del gap (−50,9 ms) del cambio de predicción (−44,5 ms) (§4a).
 
 ### 5c. Uso de IA (C5c)
 | Quién | Uso real | Qué se adoptó | Verificación y resultado |
 |---|---|---|---|
 | Valentín | Claude: leer el enunciado y el feedback en Canvas, proponer el reparto, escribir `hito2_experiment.py`, `final_experiment.py` y el borrador de §1, §2, §5 y §6. Prompt representativo: «ahora viene esto así que divídelo en dos igual y trabaja» | El reparto, la estructura de ambos scripts, los checks K/F, el bootstrap por bloques, el placebo con 200 permutaciones. Las representaciones E3a y E4 salen del feedback del profe y del comentario de la Demo | 23 checks OK en `final_experiment.py`; E0/E1 reproducen el Hito 2 (F5) y la semilla 414 reproduce el placebo del Hito 2 (F10); recalculé el global como promedio ponderado de R8 y R9 (F9) y contrasté cada cifra de §2 con `salidas_final/*.csv` |
-| Camilo | *(completar)* | | |
+| Camilo | Claude (Claude Code): traer los cambios del repo, escribir `final_errors.py`, buscar un caso con el auto de adelante en otra vuelta y redactar el borrador de §3–4. Prompt representativo: «trae los cambios del repo, y termina mi parte que corresponda con lo q se hizo en el repo». La idea de separar doblados viene de mi pregunta tras la Demo: «hay carreras donde los pilotos sacan 1 vuelta a otros y el piloto de delante en realidad va atrás» | El script descriptivo sobre las predicciones de `final_experiment.py` (sin reajustar modelos), la separación doblar / ser doblado, el segundo caso `2026-R8-81-L69` y la tabla que descompone E1 − E0 para la corrección SHAP. Descarté por ahora Ridge/Lasso y los sectores vía API externa: no cambian la pendiente única del OLS y exigen otra fuente | Corrí en mi computador los cuatro scripts en orden: 18 + 13 + 23 + 12 checks OK, y `final_experiment.py` reproduce las salidas de Valentín (diferencias ~1e-15 s). Las restas de los dos casos coinciden con `abs_err_*` (C5); el global de E1 y E4 es igual a R8/R9 ponderado (C1); la dirección doblar/ser doblado reconstruida coincide con `ahead_other_lap` (C3); la suma de la descomposición SHAP da −44,46 ms = 72,6633 − 72,7078 |
 
 ## 6. Revisión tras feedback  — [Valentín]
 
@@ -129,4 +226,4 @@ Las dos primeras apuntan al mismo problema: el gap en la línea no distingue sit
 ## 7. Contribuciones
 
 - **Valentín Castro:** pipeline de evaluación y experimentos (`hito1_reference.py`, `hito2_experiment.py`, `final_experiment.py`), §1, §2, §5, §6, README y empaquetado.
-- **Camilo Bufadel:** hipótesis de tráfico y plan (Hito 1), errores por contexto y SHAP (`hito2_shap.py`), §3, §4 *(completar con lo del informe final)*.
+- **Camilo Bufadel:** hipótesis de tráfico y plan (Hito 1); errores por contexto y SHAP (`hito2_shap.py`, Hito 2); en el informe final, `final_errors.py` y `salidas_final/errors_*` (por carrera E1/E4, doblar vs ser doblado, casos `2026-R8-3-L10` y `2026-R8-81-L69`), §3, §4 (incluida la corrección SHAP −50,9 vs −44,5 ms) y su fila de IA.

@@ -1,0 +1,13 @@
+check,passed,detail
+C0 filas de validación,True,n=1808
+C1 global = R8/R9 ponderado (E1_gap_cap5),True,-0.343 ms
+C1 global = R8/R9 ponderado (E4_samelap_gap),True,+0.006 ms
+C2 coincide con control_vs_candidate_by_race_final.csv (E4),True,
+C3 dirección reconstruida coincide con ahead_other_lap,True,595 filas en otra vuelta
+C4 subconjuntos suman n,True,
+"C5 |error| a mano = archivo (2026-R8-3-L10, E0)",True,1.705 s
+"C5 |error| a mano = archivo (2026-R8-3-L10, E1)",True,1.750 s
+"C5 |error| a mano = archivo (2026-R8-3-L10, E4)",True,1.714 s
+"C5 |error| a mano = archivo (2026-R8-81-L69, E0)",True,0.680 s
+"C5 |error| a mano = archivo (2026-R8-81-L69, E1)",True,0.763 s
+"C5 |error| a mano = archivo (2026-R8-81-L69, E4)",True,0.680 s

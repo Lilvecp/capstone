@@ -92,6 +92,7 @@ Informe: **`FINAL_REPORT.md`** (PDF entregado en Canvas) · commit con tag `Fina
 python hito2_experiment.py   # → salidas_hito2/ (18 checks)
 python hito2_shap.py         # → salidas_hito2/shap_* (13 checks)
 python final_experiment.py   # → salidas_final/ (23 checks): cambio del gap (E3a), gap en la misma vuelta (E4), placebo ×200
+python final_errors.py       # → salidas_final/errors_* (12 checks): §3 por carrera, por tipo de auto de adelante y casos
 ```
 
 | Sección del informe | Evidencia | Generado por |
@@ -99,6 +100,6 @@ python final_experiment.py   # → salidas_final/ (23 checks): cambio del gap (E
 | §1 Validez (split, ajuste, disponibilidad, IDs) | `salidas_hito2/checks.csv` · `salidas_final/checks_final.csv` · `feature_coverage_final.csv` | `hito2_experiment.py`, `final_experiment.py` |
 | §2 Comparación y decisión | `salidas_hito2/comparison_table.csv` · `salidas_final/validation_predictions_final.csv` · `control_vs_candidate_by_race_final.csv` · `run_final.json` · `placebo_E1_permutations.csv` | idem |
 | §2 Selección en R1–R7 y trials | `salidas_final/selection_loro_train_final.csv` · `trials_log_final.csv` | `final_experiment.py` |
-| §3 Errores por contexto | `salidas_final/mae_by_gap_bin_final.csv` · `mae_by_samelap_gap_bin_E4.csv` · `ahead_car_other_lap_by_round.csv` · `salidas_hito2/shap_case_error.csv` | `final_experiment.py`, `hito2_shap.py` |
+| §3 Errores por contexto | `salidas_final/errors_by_race_E1_E4.csv` · `errors_by_ahead_type.csv` · `errors_cases.csv` · `errors_checks.csv` · `mae_by_gap_bin_final.csv` · `mae_by_samelap_gap_bin_E4.csv` | `final_errors.py` (sobre las predicciones de `final_experiment.py`) |
 | §4 SHAP | `salidas_hito2/shap_local.csv` · `shap_global.csv` · `shap_run.json` | `hito2_shap.py` |
 | §5–6 Decisiones, IA, revisión tras feedback | `DECISION_LOG.md` (secciones Informe final) | — |
