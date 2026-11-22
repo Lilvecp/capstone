@@ -1,0 +1,24 @@
+check,passed,detail
+F0a versión de datos (SHA-256),True,"{'train_clean_v1.csv': '43544f38cc9e', 'validation_clean_v1.csv': 'b19efb6a908a', 'nextlap_reference_v1.py': 'f6c58925cd4a'}"
+"F0b split: train R1–7, validación R8–9",True,"train=[1, 2, 3, 4, 5, 6, 7] val=[8, 9]"
+F0c conteos,True,train=5772 val=1808
+F0d pair_id único y disjunto,True,train ∩ val = ∅
+F1 temporal: t−1 y su auto de adelante terminaron antes del fin de t,True,máx(end_time_t−1 − end_time_t) = -70.374 s (< 0)
+"F1b misma vuelta: el auto usado completó la misma vuelta, antes del fin de t, y es otro piloto",True,9871 vueltas con auto en la misma vuelta
+F2a join por pair_id sin filas perdidas ni duplicadas,True,"train 5772→5772, val 1808→1808"
+F2b mismo set de validación que Hito 1/Hito 2 (hash),True,f453a98dc906904c
+F2c gap_ahead_cap_s idéntico al del Hito 2,True,misma feature que E1
+F3 sin fuga: ningún input next_* / clean_pair; delta sin clean_pair,True,make_model bloquea next_*; gap_delta_s se calcula en `laps` (todas las vueltas) antes de unir a los pares clean
+F4 faltantes contados (regla: sin t−1 en el stint → 0),True,"[{'population': 'train R1-7', 'delta_fallback_rows': 1}, {'population': 'validation R8-9', 'delta_fallback_rows': 0}]"
+F5 E0 y E1 reproducen el MAE del Hito 2,True,E0=0.386707 E1=0.387050
+"F6 mismas filas, mismo orden y mismas predicciones E0 que validation_predictions.csv del Hito 2",True,1.808 filas
+F7 preprocesamiento ajustado solo con train (media del scaler para gap_delta_s),True,scaler=0.05119 train=0.05119 train+val=0.04942
+F7b preprocesamiento de E4 ajustado solo con train,True,scaler=3.16790 train=3.16790 train+val=3.19558
+F8 predicciones finitas,True,
+F9 E3a_delta vs E0_reference: control_MAE_s global = R8/R9 ponderado por n,True,
+F9 E3a_delta vs E0_reference: candidate_MAE_s global = R8/R9 ponderado por n,True,
+F9 E4_samelap_gap vs E0_reference: control_MAE_s global = R8/R9 ponderado por n,True,
+F9 E4_samelap_gap vs E0_reference: candidate_MAE_s global = R8/R9 ponderado por n,True,
+F9 E4_samelap_gap vs E1_gap_cap5: control_MAE_s global = R8/R9 ponderado por n,True,
+F9 E4_samelap_gap vs E1_gap_cap5: candidate_MAE_s global = R8/R9 ponderado por n,True,
+F10 la semilla 414 reproduce el placebo único del Hito 2,True,0.3867848

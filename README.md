@@ -81,3 +81,24 @@ Mismos datos que el Hito 1 (`base_NextLap/`, SHA-256 arriba). Versiones exactas 
 | 3 · SHAP local y global (E0; E1 aparte) | `HITO2.md` §3 · `salidas_hito2/shap_local.csv` · `shap_global.csv` · `shap_checks.csv` · `shap_run.json` (explainer, fondo, versiones) | `hito2_shap.py` §3 |
 | 4 · Decisiones, IA y contribuciones | `DECISION_LOG.md` §Hito 2 · `HITO2.md` §5 | — |
 | Referencia del Hito 1 reutilizada | `salidas_hito1/` (`hito1_reference.py`); E0 la reproduce (check K7) | `hito1_reference.py` |
+
+---
+
+# Informe final
+
+Informe: **`FINAL_REPORT.md`** (PDF entregado en Canvas) · commit con tag `Final`.
+
+```bash
+python hito2_experiment.py   # → salidas_hito2/ (18 checks)
+python hito2_shap.py         # → salidas_hito2/shap_* (13 checks)
+python final_experiment.py   # → salidas_final/ (23 checks): cambio del gap (E3a), gap en la misma vuelta (E4), placebo ×200
+```
+
+| Sección del informe | Evidencia | Generado por |
+|---|---|---|
+| §1 Validez (split, ajuste, disponibilidad, IDs) | `salidas_hito2/checks.csv` · `salidas_final/checks_final.csv` · `feature_coverage_final.csv` | `hito2_experiment.py`, `final_experiment.py` |
+| §2 Comparación y decisión | `salidas_hito2/comparison_table.csv` · `salidas_final/validation_predictions_final.csv` · `control_vs_candidate_by_race_final.csv` · `run_final.json` · `placebo_E1_permutations.csv` | idem |
+| §2 Selección en R1–R7 y trials | `salidas_final/selection_loro_train_final.csv` · `trials_log_final.csv` | `final_experiment.py` |
+| §3 Errores por contexto | `salidas_final/mae_by_gap_bin_final.csv` · `mae_by_samelap_gap_bin_E4.csv` · `ahead_car_other_lap_by_round.csv` · `salidas_hito2/shap_case_error.csv` | `final_experiment.py`, `hito2_shap.py` |
+| §4 SHAP | `salidas_hito2/shap_local.csv` · `shap_global.csv` · `shap_run.json` | `hito2_shap.py` |
+| §5–6 Decisiones, IA, revisión tras feedback | `DECISION_LOG.md` (secciones Informe final) | — |

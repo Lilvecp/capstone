@@ -77,3 +77,56 @@ Decidí mantener el OLS de referencia como control y evaluar el aporte de la var
 
 - Valentín: `hito2_experiment.py` (feature, selección LORO, E0/E1/E2/S1, checks K0–K9, predicciones por `pair_id`, bootstrap, tramos de gap); HITO2 §0, §1, §4; README Hito 2; corrección C1.3. Puede explicar: por qué E0 es el control pareado, por qué la diferencia negativa descarta la feature y por qué K3 se revisó.
 - Camilo: `hito2_shap.py` y `salidas_hito2/shap_*`; HITO2 §2 (tabla R8/R9, caso `2026-R8-3-L10`, desplazamiento por tramo, limitación y siguiente check) y §3 (SHAP local y global de E0, gap en E1 aparte, límites); su párrafo en §5. Puede explicar: por qué el global queda en ~0 sin que R8 y R9 coincidan, por qué el gap empeora en tráfico y qué significa (y qué no) la base de 87,2 s.
+
+---
+
+# DECISION_LOG · Informe final
+
+## Pre-registro del check pedido en el feedback del Hito 2 (escrito ANTES de evaluar; 2026-11-22)
+
+Feedback del instructor (Hito 2, comprobación para el informe final): *"Fijen antes de evaluar una representación del cambio del gap entre t−1 y t. Compárenla con E0 sobre los mismos IDs, con selección dentro de R1–R7. Comprueben si reduce el error en el tramo < 1 s y reporten el MAE total y por carrera."*
+
+| Elemento | Definición fijada antes de mirar resultados |
+|---|---|
+| Feature | `gap_delta_s(t) = gap_ahead_cap_s(t) − gap_ahead_cap_s(t−1)`. t−1 = vuelta anterior **del mismo piloto, misma carrera y mismo stint** (`lap_number = t − 1`). Ambos gaps con tope 5 s, calculados como en el Hito 2 sobre la línea de tiempo completa **antes** del filtro `clean_pair`. Negativo = el auto de adelante está más cerca que al final de t−1. Usa solo cruces con `end_time_s ≤ end_time_s(t)` |
+| Faltantes / historial corto | Si no existe la vuelta t−1 en el mismo stint (primera vuelta del stint o vuelta faltante): `gap_delta_s = 0` (sin evidencia de cambio). Regla fija; se reporta cuántas filas la usan en train y validación |
+| Variantes (máx. 2) | **E3a** = 6 inputs + `gap_delta_s`. **E3b** = 6 inputs + `gap_ahead_cap_s` + `gap_delta_s` |
+| Selección | Leave-one-race-out **dentro de R1–R7**. Se elige E3b solo si su MAE LORO medio es menor que el de E3a por más de 0,005 s; si no, E3a (más simple). Validación R8–R9 se usa una vez para la variante elegida |
+| Control pareado | E3a → **E0** (OLS 6 inputs). E3b → **E1** (OLS 6 + `gap_ahead_cap_s`), y además se reporta contra E0. Mismo `make_model('OLS')`, mismas 1.808 filas (hash `f453a98d…`) |
+| Reporte | MAE total y por carrera (R8, R9) con n, control − candidato, IC 95 % bootstrap por bloques piloto-carrera (seed 414), y MAE por tramo de gap con foco en < 1 s |
+| Apoya | MAE(candidato) < MAE(control) global **y** en R8 y R9, **y** control − candidato > 0 en el tramo < 1 s |
+| Contradice | Cualquier otro resultado. Se reporta igual, sin cambiar la feature ni la regla después de mirar validación |
+| Placebo (corrección prioritaria) | Además de la permutación única del Hito 2, se repite el placebo de E1 con **200 permutaciones** dentro de carrera (semillas 414–613) para ubicar la permutación observada dentro de esa distribución. La lectura del Hito 2 se acota a la permutación observada |
+
+**Nota de transparencia (2026-11-22).** El pre-registro de arriba se escribió en este archivo a las 14:14 (hora de Santiago, mtime del archivo) y `final_experiment.py` se ejecutó sobre validación a las 14:16, **antes** de que el pre-registro quedara en un commit. Ningún elemento del pre-registro (feature, regla de faltantes, variantes, regla de selección, criterios) se cambió después de ver resultados; el commit que lo incluye lo muestra sin diferencias.
+
+## Pre-registro de la prioridad de la Demo (escrito ANTES de evaluar; 2026-11-22, ~14:20)
+
+Comentario recibido en la Demo (20-11): el "auto de adelante" puede ir en **otra vuelta** (un auto doblado o uno que nos dobló). En circuitos cortos los doblajes son más frecuentes, y un gap a un auto que va 2 vueltas atrás no representa tráfico de carrera. Hay que **limitar el gap a autos en la misma vuelta**. Coincide con el riesgo (i) declarado en HITO1 §3.
+
+| Elemento | Definición fijada antes de mirar resultados |
+|---|---|
+| Feature | `gap_samelap_s(t)` = `end_time_s(t)` − `end_time_s` del último auto (otro piloto, misma carrera) que cruzó la línea **completando el mismo número de vuelta** que t, con `end_time_s ≤ end_time_s(t)`. Representación: `gap_samelap_cap_s = min(gap_samelap_s, 5 s)` |
+| Faltantes | Si nadie completó esa vuelta antes (el piloto va primero en esa vuelta): tope 5 s ("aire libre"), igual que la regla del Hito 2. Se reporta cuántas filas la usan |
+| Diagnóstico previo (sin target) | Proporción de pares en que el auto usado por `gap_ahead_s` (Hito 2) iba en otra vuelta, por carrera |
+| Modelo | **E4** = OLS 6 inputs + `gap_samelap_cap_s`. Una sola variante (sin búsqueda); se reporta su MAE LORO en R1–R7 junto a E0 y E1 |
+| Control pareado | **E0** (mismo OLS sin la feature). Se reporta también contra E1 para aislar el efecto de restringir a la misma vuelta |
+| Reporte | MAE total y por carrera con n, control − candidato, IC 95 % bootstrap por bloques piloto-carrera, tramo < 1 s |
+| Apoya / contradice | Mismos criterios que el pre-registro anterior: apoya solo si mejora a E0 global, en R8 y R9, y en el tramo < 1 s |
+
+## Resultados y decisiones · informe final
+
+| Fecha | Quién | Decisión | Evidencia | Siguiente paso |
+|---|---|---|---|---|
+| 2026-11-22 | Valentín | Selección del cambio del gap en R1–R7: **E3a** | LORO: E0 0,50839 · E1 0,50858 · E3a 0,50919 · E3b 0,50939 · E4 0,50916 s (`salidas_final/selection_loro_train_final.csv`). E3b no supera a E3a por > 0,005 s. Ya en train ninguna representación mejora a E0 (trials no exitosos) | — |
+| 2026-11-22 | Valentín | **Descartar E3a** (cambio del gap) | E0 − E3a = −0,208 ms, IC 95 % [−1,32 ; +0,88] ms; R8 −0,26, R9 −0,13 ms; tramo < 1 s −0,65 ms (`control_vs_candidate_by_race_final.csv`, `mae_by_gap_bin_final.csv`) | — |
+| 2026-11-22 | Valentín | **Descartar E4** (gap en la misma vuelta, prioridad de la Demo) | Diagnóstico: el auto de E1 iba en otra vuelta en el 32,9 % de validación. E0 − E4 = +0,006 ms, IC [−0,39 ; +0,40] ms; R8 −0,37, R9 +0,55 ms; tramo < 1 s −1,21 ms. No cumple el criterio "apoya". E1 − E4 = +0,348 ms (`run_final.json`) | Un modelo no lineal o por circuito con el gap en la misma vuelta, con el mismo protocolo |
+| 2026-11-22 | Valentín | Acotar el placebo del Hito 2 a la permutación observada y repetirlo 200 veces | Percentil 48,5; E1 peor que el 77 % de los placebos (`placebo_E1_permutations.csv`) | — |
+| 2026-11-22 | Equipo | **Retener E0** como modelo final y **no nominar** candidato al bono | Ningún candidato cumple los criterios pre-registrados; la ganancia de E4 (+0,006 ms) está dentro del ruido | — |
+
+## Uso de IA · informe final
+
+| Quién | Herramienta | Para qué | Qué se adoptó / cambió | Cómo se verificó |
+|---|---|---|---|---|
+| Valentín | Claude | Leer el enunciado del informe final y el feedback del Hito 2 en Canvas, proponer el reparto, escribir `final_experiment.py`, el pre-registro y el borrador de FINAL_REPORT §1, §2, §5, §6. Prompt representativo: «ahora viene esto así que divídelo en dos igual y trabaja» | Estructura del script, checks F0–F10, placebo con 200 permutaciones. La representación E4 viene del comentario de la Demo que yo transmití; E3a, del feedback del profe | 23 checks OK; E0/E1 reproducen el Hito 2 (F5) y la semilla 414 el placebo del Hito 2 (F10); MAE global = R8/R9 ponderado por n (F9); cifras de §2 y §6 contrastadas con `salidas_final/*.csv` |
+| Camilo | *(completar)* | | | |

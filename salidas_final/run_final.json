@@ -1,0 +1,94 @@
+{
+  "script": "final_experiment.py",
+  "random_seed": 414,
+  "train_rounds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "validation_rounds": [
+    8,
+    9
+  ],
+  "n_train": 5772,
+  "n_validation": 1808,
+  "validation_pair_id_set_sha256": "f453a98dc906904cba7307f7e25b67fbd9c9087df0a92a87477cf63422b76a57",
+  "feature": "gap_delta_s = gap_cap(t) − gap_cap(t−1), mismo piloto/carrera/stint; sin t−1 → 0",
+  "selection": {
+    "rule": "E3b solo si su MAE LORO medio < E3a − 0.005 s",
+    "loro_mean_MAE_s": {
+      "E0_reference": 0.508386,
+      "E1_gap_cap5": 0.50858,
+      "E3a_delta": 0.509191,
+      "E3b_gap_plus_delta": 0.509385,
+      "E4_samelap_gap": 0.509157
+    },
+    "chosen": "E3a_delta",
+    "matched_control": "E0_reference"
+  },
+  "bootstrap": [
+    {
+      "control": "E0_reference",
+      "candidate": "E3a_delta",
+      "control_minus_candidate_s": -0.0002083923785378694,
+      "ci95_low_s": -0.0013232821292276952,
+      "ci95_high_s": 0.0008819694976123239,
+      "blocks": 43,
+      "resamples": 2000,
+      "seed": 414
+    },
+    {
+      "control": "E0_reference",
+      "candidate": "E4_samelap_gap",
+      "control_minus_candidate_s": 5.693690216967973e-06,
+      "ci95_low_s": -0.000388873848640511,
+      "ci95_high_s": 0.00040372543985428105,
+      "blocks": 43,
+      "resamples": 2000,
+      "seed": 414
+    },
+    {
+      "control": "E1_gap_cap5",
+      "candidate": "E4_samelap_gap",
+      "control_minus_candidate_s": 0.0003484482000106204,
+      "ci95_low_s": -0.0017659537847049057,
+      "ci95_high_s": 0.00237182805948517,
+      "blocks": 43,
+      "resamples": 2000,
+      "seed": 414
+    }
+  ],
+  "placebo_E1": {
+    "permutations": 200,
+    "seeds": "414–613",
+    "E0_MAE_s": 0.3867069503640436,
+    "E1_MAE_s": 0.3870497048738373,
+    "hito2_single_placebo_MAE_s": 0.3867847825431219,
+    "placebo_MAE_mean_s": 0.38689087274557254,
+    "placebo_MAE_p2_5_s": 0.38652045309873484,
+    "placebo_MAE_p97_5_s": 0.3876188961684597,
+    "placebo_MAE_min_s": 0.38612255842834525,
+    "placebo_MAE_max_s": 0.3883041115869767,
+    "share_placebo_better_than_E0": 0.265,
+    "share_placebo_better_than_E1": 0.77,
+    "percentile_of_hito2_permutation": 0.485
+  },
+  "data_sha256": {
+    "train_clean_v1.csv": "43544f38cc9ef32b44886e6751e03522601265160086fe3a4956f04b87bd5c13",
+    "validation_clean_v1.csv": "b19efb6a908af12a5d2c6bdde29aa40984295e62ce0f187a201b579278db7ee8",
+    "nextlap_reference_v1.py": "f6c58925cd4a477bf3e1a5a2b3968e67df3a1cffabecee9e89701c3ac2d5f994"
+  },
+  "test_data_used": false,
+  "environment": {
+    "python": "3.10.12",
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "sklearn": "1.7.2",
+    "platform": "Linux-6.8.0-149-generic-aarch64-with-glibc2.35"
+  },
+  "checks_passed": 23
+}

@@ -1,0 +1,10 @@
+stage,variant,inputs,model,rows,MAE_s,metric_note,used_validation,who
+final · selection LORO train R1-7,E0_reference,(6 ref),OLS make_model,"train held-out rounds, n=5772",0.5083861760362705,mean of 7 held-out-race MAEs,False,Valentín
+final · selection LORO train R1-7,E1_gap_cap5,gap_ahead_cap_s,OLS make_model,"train held-out rounds, n=5772",0.5085802441322854,mean of 7 held-out-race MAEs,False,Valentín
+final · selection LORO train R1-7,E3a_delta,gap_delta_s,OLS make_model,"train held-out rounds, n=5772",0.5091908492078933,mean of 7 held-out-race MAEs,False,Valentín
+final · selection LORO train R1-7,E3b_gap_plus_delta,gap_ahead_cap_s+gap_delta_s,OLS make_model,"train held-out rounds, n=5772",0.5093853952300146,mean of 7 held-out-race MAEs,False,Valentín
+final · selection LORO train R1-7,E4_samelap_gap,gap_samelap_cap_s,OLS make_model,"train held-out rounds, n=5772",0.5091574808425724,mean of 7 held-out-race MAEs,False,Valentín
+final · validation R8-9 (single use),E0_reference,(6 ref),OLS make_model,validation n=1808 (hash f453a98d…),0.3867069503640436,pooled validation MAE,True,Valentín
+final · validation R8-9 (single use),E1_gap_cap5,gap_ahead_cap_s,OLS make_model,validation n=1808 (hash f453a98d…),0.3870497048738373,pooled validation MAE,True,Valentín
+final · validation R8-9 (single use),E3a_delta,gap_delta_s,OLS make_model,validation n=1808 (hash f453a98d…),0.3869153427425815,pooled validation MAE,True,Valentín
+final · validation R8-9 (single use),E4_samelap_gap,gap_samelap_cap_s,OLS make_model,validation n=1808 (hash f453a98d…),0.38670125667382665,pooled validation MAE,True,Valentín
